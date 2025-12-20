@@ -32,6 +32,9 @@ Replay the recorded infrared codes with ESP32 + infrared emitter to validate eac
 
 <img width="412" height="180" alt="Screenshot 2025-12-20 at 11 53 45 AM" src="https://github.com/user-attachments/assets/c9d4621d-268f-4436-b158-6804dc8e5c9e" />
 
+in my sample code,   
+click button A on M5Stack will start to receive and decode the IR code , it will send the code to USBserial, with the irsaver.py on the computer side, it will automatically store the received IR code in a csv file
+click button B on M5Stack will replay the saved IR code  
 
 2. Get ANT+ USB stick
 
