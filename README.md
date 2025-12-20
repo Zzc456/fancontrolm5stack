@@ -5,7 +5,7 @@ Smart trainer fans on the market are often expensive, typically costing around $
 # Features
 
 1. Continuously monitor data from the Power Meter, Heart Rate Sensor, and Cadence Sensor, and publish these updates to the MQTT server.
-2. The ESP32 subscribes to the MQTT server, retrieves the latest sensor data, and—based on pre-programmed logic—controls the fan by turning it on/off or adjusting its speed accordingly.
+2. The ESP32 board subscribes to the MQTT server, retrieves the latest sensor data, and—based on pre-programmed logic—controls the fan by turning it on/off or adjusting its speed accordingly.
 
 # Acknowledgments
 
@@ -55,7 +55,11 @@ ant_monitor will monitor the output of PowerMeter and update it MQTT Server.
 
 7. Put the fan and ESP32 board in front of the trainer, Enjoy your riding :) 
 
+<img width="203" height="140" alt="Screenshot 2025-12-20 at 1 32 19 PM" src="https://github.com/user-attachments/assets/743ed108-36a4-4a23-86c5-abf8035b4031" />
 
+# Reference
 
+M5Stack: https://m5stack.com/
+Arduino IDE: https://www.arduino.cc/en/software/
 
 
