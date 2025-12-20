@@ -4,7 +4,7 @@ When you ride indoors, you don’t get the natural breeze you’d have outside, 
 
 The bad thing is that smart trainer fans on the market are often expensive, typically costing around $300. This project aims to provide an affordable alternative by transforming a standard low-cost fan into a smart trainer fan using a few simple add-ons and easy-to-follow steps. The goal is to make indoor training more comfortable and accessible for everyone without breaking the bank.
 
-Note: To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, battery, and offers easy expansion options for adding an infrared receiver and emitter board.
+Note: To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, battery, rich libs and offers easy expansion options for adding an infrared receiver and emitter board.
 
 
 
@@ -24,7 +24,7 @@ This project leverages ANT/ANT+ Python library from https://github.com/Tigge/ope
 
 1. Infrared codes collection and validation
 
-Find or purchase a fan with an infrared remote control,  collect, decode, and record its infrared codes with ESP32 + infrared receiver. Typically, the codes for turning on, turning off, increasing, or reducing the fan speed. 
+Find or purchase a fan with an infrared remote control,  collect, decode, and record its infrared codes with ESP32 + infrared receiver. Typically, the data codes for turning on, turning off, increasing, or reducing the fan speed. 
    
 <img width="445" height="147" alt="Screenshot 2025-12-20 at 11 51 12 AM" src="https://github.com/user-attachments/assets/805d1dcc-1574-4e5a-8780-a266d02266a8" />
 
