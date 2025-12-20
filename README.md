@@ -53,7 +53,7 @@ ant_monitor will monitor the output of PowerMeter and update it MQTT Server.
 
 6. Modify example ESP32 codes (config_example.h) with your recorded infrared codes, build and update the program (main.ino). 
 
-7. Put the fan and ESP32 board in front of the trainer, Enjoy your ridings :) 
+7. Put the fan and ESP32 board in front of the trainer, Enjoy your riding :) 
 
 
 
