@@ -1,6 +1,6 @@
 # DIY a Smart Trainer Fan 
  
-When you ride indoors, you don’t get the natural breeze you’d have outside, so it’s easy to overheat and feel uncomfortable. A smart trainer fan fixes that by adjusting airflow automatically based on how hard you’re working—using things like powerMeter, heart rate, or cadence. This keeps you cool, makes training more enjoyable, and helps you push longer without burning out.
+When riding indoors, we don’t get the natural breeze we’d have outside, so it’s easy to overheat and feel uncomfortable. A smart trainer fan fixes that by adjusting airflow automatically based on how hard we’re working—using things like powerMeter, heart rate, or cadence. This keeps us cool, makes training more enjoyable, and helps us push longer without burning out.
 
 The bad thing is that smart trainer fans on the market are often expensive, typically costing around $300. This project aims to provide an affordable alternative by transforming a standard low-cost fan into a smart trainer fan using a few simple add-ons and easy-to-follow steps. The goal is to make indoor training more comfortable and accessible for everyone without breaking the bank.
 
