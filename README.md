@@ -2,8 +2,14 @@
  
 Smart trainer fans on the market are often expensive, typically costing around $300. This project aims to provide an affordable alternative by transforming a standard low-cost fan into a smart trainer fan using a few simple add-ons and easy-to-follow steps. The goal is to make indoor training more comfortable and accessible for everyone without breaking the bank.
 
-# Designs
+# Features
 
+1. Continuously monitor data from the Power Meter, Heart Rate Sensor, and Cadence Sensor, and publish these updates to the MQTT server.
+2. The ESP32 subscribes to the MQTT server, retrieves the latest sensor data, and—based on pre-programmed logic—controls the fan by turning it on/off or adjusting its speed accordingly.
+
+# Acknowledgments
+
+This project leverages ANT/ANT+ Python library from https://github.com/Tigge/openant. Appreciate the open-source community for making these resources available
 
 
 # Steps
@@ -26,3 +32,20 @@ To monitor your heart rate, cadence, and power output during training, a device 
 <img width="100" height="132" alt="Screenshot 2025-12-20 at 12 08 41 PM" src="https://github.com/user-attachments/assets/8c388d9c-d6bd-47a9-9397-6c0feb7fee32" />
 
    
+3. Plug in the ANT+ USB stick, install the openant library and MQTT server
+
+Plug in ANT+ USB stick in a Linux-based laptop/mini PC/Raspberry Pi and ensure ANT+ USB stick is recognized successfully. (Ubuntu 16.04 LTS is the first to have seamless, stable integration with modern ANT+ libraries like OpenAnt. Older systems like Ubuntu 12.04 often required manual kernel module loading)
+<img width="776" height="153" alt="Screenshot 2025-12-20 at 12 43 44 PM" src="https://github.com/user-attachments/assets/fd2dadaa-41ef-4246-a43f-be806c9ece03" />
+
+
+Following the README in https://github.com/Tigge/openant to prepare and install python libiary, MQTT Server
+
+4. Validate the sensor data pub and sub with the MQTT Server by using mqtt docker image
+
+<img width="669" height="135" alt="Screenshot 2025-12-20 at 12 57 35 PM" src="https://github.com/user-attachments/assets/7886f1bc-e084-4a1a-ae9b-7b76f1f242fb" />
+
+5. 
+
+
+
+
