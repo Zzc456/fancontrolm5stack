@@ -4,7 +4,7 @@ When you ride indoors, you don’t get the natural breeze you’d have outside, 
 
 The bad thing is that smart trainer fans on the market are often expensive, typically costing around $300. This project aims to provide an affordable alternative by transforming a standard low-cost fan into a smart trainer fan using a few simple add-ons and easy-to-follow steps. The goal is to make indoor training more comfortable and accessible for everyone without breaking the bank.
 
-Note: To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, and offers easy expansion options for adding an infrared receiver and emitter board.
+Note: To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, battery, and offers easy expansion options for adding an infrared receiver and emitter board.
 
 
 
