@@ -44,7 +44,15 @@ Following the README in https://github.com/Tigge/openant to prepare and install 
 
 <img width="669" height="135" alt="Screenshot 2025-12-20 at 12 57 35 PM" src="https://github.com/user-attachments/assets/7886f1bc-e084-4a1a-ae9b-7b76f1f242fb" />
 
-5. 
+5. Run ANT Monitor
+
+The example code: ant_monitor.py only monitors PowerMeter, you could modify it to add support for more sensors easily like Heart Rate, Canadence .. etc
+ant_monitor will monitor the output of PowerMeter and update it MQTT Server. 
+
+<img width="637" height="125" alt="Screenshot 2025-12-20 at 1 13 45 PM" src="https://github.com/user-attachments/assets/42dea099-046c-4851-8061-5e2a5c54033f" />
+
+6. 
+
 
 
 
