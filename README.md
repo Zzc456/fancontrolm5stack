@@ -4,7 +4,7 @@ When you ride indoors, you don’t get the natural breeze you’d have outside, 
 
 The bad thing is that smart trainer fans on the market are often expensive, typically costing around $300. This project aims to provide an affordable alternative by transforming a standard low-cost fan into a smart trainer fan using a few simple add-ons and easy-to-follow steps. The goal is to make indoor training more comfortable and accessible for everyone without breaking the bank.
 
-To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU and offers easy expansion options for adding an infrared receiver and emitter board.
+To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, and offers easy expansion options for adding an infrared receiver and emitter board.
 
 
 # Features
@@ -56,9 +56,13 @@ ant_monitor will monitor the output of PowerMeter and update it MQTT Server.
 
 <img width="637" height="125" alt="Screenshot 2025-12-20 at 1 13 45 PM" src="https://github.com/user-attachments/assets/42dea099-046c-4851-8061-5e2a5c54033f" />
 
-6. Modify example ESP32 codes (config_example.h) with your recorded infrared codes, build and update the program (main.ino). 
+6. Prepare M5Stack Board
 
-7. Put the fan and ESP32 board in front of the trainer, Enjoy your riding :) 
+Modify example ESP32 codes (config_example.h) with your recorded infrared codes  
+Modify example ESP32 codes (config_example.h) with your own network settings  
+build and update the program (main.ino).   
+
+9. Put the fan and ESP32 board in front of the trainer, Enjoy your riding :) 
 
 <img width="203" height="140" alt="Screenshot 2025-12-20 at 1 32 19 PM" src="https://github.com/user-attachments/assets/743ed108-36a4-4a23-86c5-abf8035b4031" />
 
