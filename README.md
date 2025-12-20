@@ -51,7 +51,7 @@ ant_monitor will monitor the output of PowerMeter and update it MQTT Server.
 
 <img width="637" height="125" alt="Screenshot 2025-12-20 at 1 13 45 PM" src="https://github.com/user-attachments/assets/42dea099-046c-4851-8061-5e2a5c54033f" />
 
-6. 
+6. Replace your Infrared codes in the example ESP32 codes, build and program 
 
 
 
