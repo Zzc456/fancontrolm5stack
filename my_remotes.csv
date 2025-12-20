@@ -1,0 +1,4 @@
+Type,Protocol,Address,Command
+IR_SIGNAL,NEC,DE80,0
+IR_SIGNAL,NEC,DE80,8
+IR_SIGNAL,NEC,DE80,10
