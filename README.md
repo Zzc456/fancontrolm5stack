@@ -7,10 +7,13 @@ The bad thing is that smart trainer fans on the market are often expensive, typi
 To make the DIY process simple and accessible, we chose M5Stack as our starting point. It comes with an integrated ESP32 MCU, WiFi interface, and offers easy expansion options for adding an infrared receiver and emitter board.
 
 
+
 # Features
 
 1. Continuously monitor data from the Power Meter, Heart Rate Sensor, and Cadence Sensor, and publish these updates to the MQTT server.
 2. The ESP32 board subscribes to the MQTT server, retrieves the latest sensor data, and—based on pre-programmed logic—controls the fan by turning it on/off or adjusting its speed accordingly.
+
+<img width="479" height="328" alt="Screenshot 2025-12-20 at 2 02 00 PM" src="https://github.com/user-attachments/assets/f50d7671-f355-432d-a5a1-713693faf701" />
 
 # Acknowledgments
 
