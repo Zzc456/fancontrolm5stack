@@ -3,21 +3,31 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-#include "config.h"
+#include "config.h" 
+
+#define IR_SEND_PIN 21
 
 // --- GLOBAL VARIABLES ---
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Logic variables
-int currentSpeed = 1; // We track the fan's actual speed (1-5) here
+int currentSpeed = 1;
+int thresholds[6]; // Stores our dynamic limits (0 to 5)
 
 // Averaging variables
 const int numReadings = 10;
-int readings[numReadings];  // The readings from the analog input
-int readIndex = 0;          // The index of the current reading
-int total = 0;              // The running total
-int average = 0;            // The average
+int readings[numReadings]; 
+int readIndex = 0;          
+int total = 0;              
+int average = 0;            
+
+// --- FUNCTION DECLARATIONS ---
+void setupWiFi();
+void reconnect();
+void mqttCallback(char* topic, byte* payload, unsigned int length);
+void adjustFanSpeed(int target);
+void updateDisplay(int raw, int avg, int slot);
 
 void setup() {
     M5.begin();
@@ -29,128 +39,119 @@ void setup() {
     IrSender.begin(DISABLE_LED_FEEDBACK);
     IrSender.setSendPin(IR_SEND_PIN);
 
-    // 2. Initialize Averaging Buffer
-    for (int i = 0; i < numReadings; i++) {
-        readings[i] = 0;
+    // 2. Load Defaults from config.h
+    for(int i=0; i<6; i++) {
+        thresholds[i] = DEFAULT_LEVELS[i];
     }
 
-    // 3. Connect to WiFi
-    setupWiFi();
+    // 3. Initialize Averaging Buffer
+    for (int i = 0; i < numReadings; i++) readings[i] = 0;
 
-    // 4. Connect to MQTT
-    client.setServer(mqtt_server, 1883); // Default MQTT port
+    // 4. Setup Network
+    setupWiFi();
+    client.setServer(MQTT_SERVER, 1883); 
     client.setCallback(mqttCallback);
 
-    // 5. FAN INITIALIZATION SEQUENCE
+    // 5. Fan Reset Sequence
     M5.Display.setCursor(10, 10);
     M5.Display.println("Resetting Fan...");
-    
-    // A) Turn On
     IrSender.sendNEC(IR_ADDR, CMD_ON, 0);
     delay(1000); 
-    
-    // B) Reset to Lowest (Send DOWN 5 times)
     for(int i=0; i<5; i++) {
         IrSender.sendNEC(IR_ADDR, CMD_DOWN, 0);
         delay(300);
     }
-    currentSpeed = 1; // We are now confident fan is at Speed 1
+    currentSpeed = 1; 
     
     M5.Display.clear(TFT_WHITE);
-    M5.Display.setCursor(0, 0);
-    M5.Display.println("Auto Fan Control");
-    M5.Display.println("----------------");
+    updateDisplay(0, 0, 1);
 }
 
 void loop() {
     M5.update();
-    
-    // Ensure MQTT is connected
-    if (!client.connected()) {
-        reconnect();
-    }
-    client.loop(); // Check for new messages
+    if (!client.connected()) reconnect();
+    client.loop();
 }
 
-// --- MQTT CALLBACK (Where the magic happens) ---
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-    // 1. Convert payload to String then Int
+    // 1. Convert Payload to Int
     String message;
-    for (int i = 0; i < length; i++) {
-        message += (char)payload[i];
-    }
-    int newValue = message.toInt();
+    for (int i = 0; i < length; i++) message += (char)payload[i];
+    int value = message.toInt();
+    String strTopic = String(topic);
 
-    // 2. Calculate Moving Average
-    // Subtract the last reading
-    total = total - readings[readIndex];
-    // Read new value
-    readings[readIndex] = newValue;
-    // Add the reading to the total
-    total = total + readings[readIndex];
-    // Advance to the next position in the array
-    readIndex = readIndex + 1;
-    // If we're at the end of the array...
-    if (readIndex >= numReadings) {
-        readIndex = 0; // ...wrap around to the beginning
-    }
-    // Calculate the average
-    average = total / numReadings;
+    // --- CASE A: IT IS A CONFIGURATION UPDATE ---
+    // Check if topic starts with "fitness/control/powermeter/"
+    if (strTopic.startsWith(TOPIC_LEVELS)) {
+        // Find which level it is (last character)
+        // e.g. "fitness/control/powermeter/level3" -> char '3'
+        char levelChar = strTopic.charAt(strTopic.length() - 1);
+        int levelIndex = levelChar - '0'; // Convert char '3' to int 3
 
-    // 3. Determine Target Slot based on Average
-    int targetSlot = 1;
-
-    if (average < 90) {
-        targetSlot = 1; // Safety: below 90 stays at 1
-    } else if (average >= 90 && average < 120) {
-        targetSlot = 1;
-    } else if (average >= 120 && average < 150) {
-        targetSlot = 2;
-    } else if (average >= 150 && average < 180) {
-        targetSlot = 3;
-    } else if (average >= 180 && average < 210) {
-        targetSlot = 4;
-    } else if (average >= 210) {
-        targetSlot = 5;
+        if (levelIndex >= 0 && levelIndex <= 5) {
+            thresholds[levelIndex] = value;
+            Serial.printf("Updated Level %d threshold to %d\n", levelIndex, value);
+        }
+        return; // Don't run fan logic for config updates
     }
 
-    // 4. Adjust Fan if needed
-    if (targetSlot != currentSpeed) {
-        adjustFanSpeed(targetSlot);
-    }
+    // --- CASE B: IT IS DATA (Update Fan) ---
+    if (strTopic.equals(TOPIC_DATA)) {
+        // 1. Update Average
+        total = total - readings[readIndex];
+        readings[readIndex] = value;
+        total = total + readings[readIndex];
+        readIndex = readIndex + 1;
+        if (readIndex >= numReadings) readIndex = 0;
+        average = total / numReadings;
 
-    // 5. Update Display
-    updateDisplay(newValue, average, targetSlot);
+        // 2. Determine Target Slot (Dynamic Logic)
+        // We check from highest (5) down to lowest (1)
+        int targetSlot = 1; // Default minimum
+
+        for (int i = 5; i >= 1; i--) {
+            if (average >= thresholds[i]) {
+                targetSlot = i;
+                break; // Found our slot, stop checking
+            }
+        }
+
+        // 3. Adjust Fan
+        if (targetSlot != currentSpeed) {
+            adjustFanSpeed(targetSlot);
+        }
+
+        updateDisplay(value, average, targetSlot);
+    }
 }
 
 void adjustFanSpeed(int target) {
-    // Determine direction
     if (target > currentSpeed) {
-        // Need to go UP
         int steps = target - currentSpeed;
         for (int i = 0; i < steps; i++) {
             IrSender.sendNEC(IR_ADDR, CMD_UP, 0);
-            delay(300); // Wait for fan to register
+            delay(300);
         }
     } else {
-        // Need to go DOWN
         int steps = currentSpeed - target;
         for (int i = 0; i < steps; i++) {
             IrSender.sendNEC(IR_ADDR, CMD_DOWN, 0);
             delay(300);
         }
     }
-    // Update our tracking variable
     currentSpeed = target;
 }
 
-// --- NETWORK HELPER FUNCTIONS ---
 void setupWiFi() {
     delay(10);
     M5.Display.println();
     M5.Display.print("Connecting to ");
-    M5.Display.println(ssid);
-    WiFi.begin(ssid, password);
+    // Use variable from config.h
+    M5.Display.println(WIFI_SSID); 
+    
+    // Use variables from config.h
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         M5.Display.print(".");
@@ -160,32 +161,48 @@ void setupWiFi() {
 
 void reconnect() {
     while (!client.connected()) {
-        M5.Display.print("Attempting MQTT connection...");
-        String clientId = "M5StackClient-";
-        clientId += String(random(0xffff), HEX);
+        M5.Display.print("Conn MQTT...");
+        String clientId = "M5Stack-" + String(random(0xffff), HEX);
         
         if (client.connect(clientId.c_str())) {
-            M5.Display.println("connected");
-            client.subscribe(mqtt_topic);
+            M5.Display.println("OK");
+            
+            // 1. Subscribe to Data Stream
+            client.subscribe(TOPIC_DATA);
+            
+            // 2. Subscribe to ALL Config Levels (level0 - level5)
+            // We construct the string "fitness/control/powermeter/levelX"
+            for(int i=0; i<=5; i++) {
+                String configTopic = String(TOPIC_LEVELS) + "level" + String(i);
+                client.subscribe(configTopic.c_str());
+                Serial.print("Subscribed: "); Serial.println(configTopic);
+            }
+            
         } else {
-            M5.Display.print("failed, rc=");
+            M5.Display.print("Fail rc=");
             M5.Display.print(client.state());
-            M5.Display.println(" try again in 5s");
-            delay(5000);
+            delay(2000);
         }
     }
 }
 
 void updateDisplay(int raw, int avg, int slot) {
-    // Only update the dynamic part of screen
+    // Only redraw the bottom half to avoid flicker
     M5.Display.fillRect(0, 40, 320, 200, TFT_WHITE); 
-    M5.Display.setCursor(0, 50);
     
-    M5.Display.printf("Raw In: %d\n", raw);
-    M5.Display.printf("Avg 10: %d\n", avg);
+    M5.Display.setCursor(0, 45);
+    M5.Display.printf("Input: %d  (Avg: %d)\n", raw, avg);
     
-    M5.Display.setTextSize(2); // Make speed large
-    M5.Display.setCursor(0, 100);
-    M5.Display.printf("FAN SLOT: %d", slot);
-    M5.Display.setTextSize(1); // Reset size
+    // Show current Thresholds for debugging
+    M5.Display.setTextSize(1);
+    M5.Display.setCursor(0, 70);
+    M5.Display.printf("L1:%d L2:%d L3:%d \nL4:%d L5:%d", 
+        thresholds[1], thresholds[2], thresholds[3], thresholds[4], thresholds[5]);
+
+    M5.Display.setTextSize(3); 
+    M5.Display.setCursor(60, 130);
+    M5.Display.setTextColor(TFT_MAGENTA);
+    M5.Display.printf("SLOT %d", slot);
+    M5.Display.setTextColor(TFT_BLACK);
+    M5.Display.setTextSize(1); 
 }
