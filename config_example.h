@@ -1,17 +1,18 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// --- USER SECRETS ---
-const char* WIFI_SSID     = "YOUR_WIFI_SSID";
-const char* WIFI_PASS     = "YOUR_WIFI_PASS";
-const char* MQTT_SERVER   = "YOUR_MQTT_IP";
+// --- SENSITIVE DATA ---
+const char* WIFI_SSID     = "YOUR_WIFI_NAME";
+const char* WIFI_PASS     = "YOUR_WIFI_PASSWORD";
+const char* MQTT_SERVER   = "192.168.1.100";
 
-// --- MQTT TOPICS ---
-const char* TOPIC_DATA    = "home/sensors/temp";
-const char* TOPIC_LEVELS  = "fitness/control/powermeter/"; 
+// --- TOPICS ---
+// The stream of numbers (Wattage/Speed)
+const char* TOPIC_DATA    = "home/sensors/temp"; 
 
-// --- DEFAULTS ---
-const int DEFAULT_LEVELS[6] = { 0, 90, 120, 150, 180, 210 };
+// The base path for settings. 
+// We will listen to "fitness/control/powermeter/+"
+const char* TOPIC_CONFIG_BASE = "fitness/control/powermeter/";
 
 // --- IR CODES ---
 const uint16_t IR_ADDR    = 0xDE80;
