@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ANT+ Real-time Control</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .data-box { background: #333; color: #0f0; padding: 20px; font-size: 2em; margin: 20px 0; border-radius: 10px; text-align: center; }
+        .box { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+        input { margin: 5px 0; padding: 5px; width: 100px; }
+    </style>
+</head>
+<body>
+
+    <!-- Real-time Display -->
+    <h2>Current Power Output</h2>
+    <div class="data-box">
+        <span id="power-display">Loading...</span> Watts
+    </div>
+
+    <!-- Monitoring Buttons -->
+    <div class="box">
+        <h3>System Status</h3>
+        <p>
+            ANT+ Monitor Status: 
+            <span id="script-status" style="font-weight: bold; color: gray;">Checking...</span>
+        </p>
+    </div>
+
+    <script>
+        function checkScriptStatus() {
+            fetch('/get_script_status')
+                .then(response => response.json())
+                .then(data => {
+                    const statusSpan = document.getElementById('script-status');
+                    statusSpan.innerText = data.status;
+                    statusSpan.style.color = data.color;
+                })
+                .catch(error => console.error('Error checking script status:', error));
+        }
+
+        // Run every 2 seconds
+        setInterval(checkScriptStatus, 2000);
+        // Initial call
+        checkScriptStatus();
+    </script>     
+    
+    <div class="box">
+        <form method="POST" action="/control">
+            <button type="submit" name="action" value="start_monitoring">Start ANT+ Monitoring</button>
+            <button type="submit" name="action" value="stop_monitoring">Stop ANT+ Monitoring</button>
+        </form>
+    </div>
+
+    <!-- Threshold Settings -->
+    <div class="box">
+        <h3>Threshold Settings</h3>
+        <form method="POST" action="/control">
+            <label>L0:</label> <input type="text" name="level0">
+            <label>L1:</label> <input type="text" name="level1">
+            <label>L2:</label> <input type="text" name="level2">
+            <label>L3:</label> <input type="text" name="level3">
+            <label>L4:</label> <input type="text" name="level4">
+            <br><br>
+            <button type="submit" name="action" value="change_threshold">Change Threshold</button>
+        </form>
+    </div>
+
+    <!-- JavaScript for 2-second updates -->
+    <script>
+        function updatePower() {
+            fetch('/get_power')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('power-display').innerText = data.value;
+                })
+                .catch(error => console.error('Error fetching power:', error));
+        }
+
+        // Run every 5 seconds
+        setInterval(updatePower, 5000);
+        // Initial call
+        updatePower();
+    </script>
+
+</body>
+</html>
